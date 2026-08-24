@@ -1,106 +1,149 @@
 @import url('https://fonts.googleapis.com/css2?family=Biryani:wght@800&display=swap');
+
+:root {
+    --game-rows: 4;
+    --game-cols: 4;
+}
+
 * {
     font-family: 'Biryani', sans-serif;
+    box-sizing: border-box;
 }
+
 html {
-    width:100vw;
-    height:100%;
+    width: 100vw;
+    height: 100%;
 }
+
 body {
-    margin:0px;
+    margin: 0px;
     background-image: -webkit-gradient(linear, left top, left bottom, from(#4481eb), to(#04bedd));
     background-image: -o-linear-gradient(top, #4481eb 0%, #04bedd 100%);
     background-image: linear-gradient(to bottom, #4481eb 0%, #04bedd 100%);
+    overflow-x: hidden;
 }
 
 p {
     font-size: 40px;
-    margin-top:5px;
+    margin-top: 5px;
 }
+
+/* Dynamic responsive card sizing based on viewport and grid dimension */
 td {
     background-color: transparent;
-    height:70px;
-    width:70px;
+    width: min(calc((92vw - (var(--game-cols) * 6px)) / var(--game-cols)), calc((72vh - (var(--game-rows) * 6px)) / var(--game-rows)), 90px);
+    height: min(calc((92vw - (var(--game-cols) * 6px)) / var(--game-cols)), calc((72vh - (var(--game-rows) * 6px)) / var(--game-rows)), 90px);
+    padding: 3px;
 }
+
 td, .inner, .front, .back {
-    border-radius: 4px;
+    border-radius: 6px;
 }
+
 table {
-    margin-top: 80px;
+    margin-top: 20px;
+    border-collapse: separate;
+    border-spacing: 0;
 }
 
 #inst {
     width: 85vw;
-    background-color: rgba(255,255,255,0.1);
+    max-width: 500px;
+    background-color: rgba(255, 255, 255, 0.1);
     text-align: center;
-    margin-top:16vh;
+    margin-top: 10vh;
     -webkit-backdrop-filter: blur(10px);
             backdrop-filter: blur(10px);
     border: 0.2px solid #ffff;
     border-radius: 10px;
-    padding: 5px;
+    padding: 15px;
 }
+
 #inst li {
     text-align: left;
     padding: 5px;
 }
 
 button {
-    background-color: rgba(255,255,255,0.2);
-    -webkit-backdrop-filter: (20px);
-    backdrop-filter: (20px);
+    background-color: rgba(255, 255, 255, 0.2);
+    -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
     color: white;
     margin: 5px;
     border: 0.1px solid #ffff;
     border-radius: 10px;
-    font-weight: smaller;
-    width:100px;
-    font-size:18px;
-    padding:5px;
+    font-weight: bold;
+    width: 100px;
+    font-size: 18px;
+    padding: 8px 5px;
+    cursor: pointer;
+    transition: background-color 0.2s, opacity 0.2s;
+}
+
+button:hover:not(:disabled) {
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+button:disabled, button.disabled-btn {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
 }
 
 #ol {
-    position: absolute;
-    height:100vh;
-    width:100vw;
-    background-color: rgba(0,0,200,0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    background-color: rgba(0, 0, 200, 0.15);
     color: white;
     -webkit-backdrop-filter: blur(8px);
             backdrop-filter: blur(8px);
-    z-index:2;
-    
+    z-index: 2;
+    overflow-y: auto;
 }
+
 #iol {
     text-align: center;
-    position: absolute;
-    width: 100vw;
-    top: 35vw;
+    position: relative;
+    width: 90vw;
+    max-width: 600px;
+    margin-top: 15vh;
+    background-color: rgba(255, 255, 255, 0.15);
+    padding: 20px;
+    border-radius: 15px;
+    border: 0.2px solid #ffffff;
+    -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
 }
 
 #title {
-    background-color: rgba(255,255,255,0.25);
+    background-color: rgba(255, 255, 255, 0.25);
     -webkit-backdrop-filter: blur(15px);
             backdrop-filter: blur(15px);
-    border-radius:10px;
+    border-radius: 10px;
     margin: 8px;
-    margin-top:0px;
+    margin-top: 0px;
     color: white;
-    height:56px;
+    height: 56px;
     text-align: center;
+    position: relative;
 }
 
 #time {
     position: absolute;
     right: 20px;
     font-size: 16px;
-    top: 8.5px;
+    top: 12px;
 }
 
 #moves {
     position: absolute;
     left: 20px;
     font-size: 16px;
-    top:8.5px;
+    top: 12px;
 }
 
 #logo {
@@ -123,16 +166,34 @@ button {
             transform-style: preserve-3d;
     -webkit-transform: rotateY(0deg);
             transform: rotateY(0deg);
+    cursor: pointer;
 }
 
 .front {
-    background-color: rgba(255,255,255,0.3);
+    background-color: rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .back {
-    background-color: rgba(255,255,255,0.5);
+    background-color: rgba(255, 255, 255, 0.85);
     -webkit-transform: rotateY(180deg);
             transform: rotateY(180deg);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Image styling inside back of card */
+.back img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    border-radius: inherit;
+    pointer-events: none;
 }
 
 .front, .back {
@@ -142,6 +203,7 @@ button {
     -webkit-backface-visibility: hidden;
             backface-visibility: hidden;
 }
+
 button:hover, button:active {
-    outline:0;
+    outline: 0;
 }
