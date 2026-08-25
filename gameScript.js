@@ -21,36 +21,30 @@ function escapeHtml(str) {
         .replace(/>/g, '&gt;');
 }
 
-// Generate level buttons HTML based on available images
-function getButtonsHtml(availableCount) {
-    var levels = [
-        { r: 3, l: 4 },
-        { r: 4, l: 4 },
-        { r: 4, l: 5 },
-        { r: 5, l: 6 },
-        { r: 6, l: 6 }
-    ];
-    return levels.map(function(lvl) {
-        var req = (lvl.r * lvl.l) / 2;
-        var isDisabled = availableCount < req;
-        var titleText = isDisabled ? "Requires " + req + " images (only " + availableCount + " available)" : lvl.r + " x " + lvl.l;
-        var disabledAttr = isDisabled ? 'disabled class="disabled-btn"' : '';
-        return `<button ${disabledAttr} title="${titleText}" onclick="start(${lvl.r}, ${lvl.l})">${lvl.r} x ${lvl.l}</button>`;
-    }).join(" ");
+// Handle "بازگشت" button click
+function goBack() {
+    fetch('back.txt')
+        .then(function(response) {
+            if (!response.ok) {
+                throw new Error("Failed to load back.txt");
+            }
+            return response.text();
+        })
+        .then(function(text) {
+            var url = text.trim();
+            if (url) {
+                window.location.href = url;
+            } else {
+                alert("لینک بازگشت در دسترس نیست.");
+            }
+        })
+        .catch(function(err) {
+            console.error("Error loading back.txt:", err);
+            alert("لینک بازگشت در دسترس نیست.");
+        });
 }
 
-// Helper to show welcome overlay
-function showWelcomeOverlay() {
-    var btnHtml = getButtonsHtml(allImages.length);
-    var statusMsg = "";
-    if (allImages.length === 0) {
-        statusMsg = `<p style="color: #ffdddd; font-size:16px;">Loading images manifest...</p>`;
-    }
-    $("#ol").html(`<center><div id="inst"><h3>Welcome !</h3>Instructions For Game<br/><br/><li>Make pairs of similiar blocks by flipping them.</li><li>To flip a block you can click on it.</li><li>If two blocks you clicked are not similar, they will be flipped back.</li><p style="font-size:18px;">Click one of the following mode to start the game.</p>${statusMsg}</div>${btnHtml}</center>`);
-    $("#ol").show();
-}
-
-// Load manifest on page load
+// Load manifest on page load and start 4x5 game directly
 window.onload = function() {
     init();
     fetch('pictures/images.json')
@@ -89,6 +83,8 @@ function preloadImages(imageFiles) {
 
 // Starting the game
 function start(r, l) {
+    r = r || 4;
+    l = l || 5;
     var noItems = (r * l) / 2;
     if (allImages.length < noItems) {
         alert("Not enough images for this level. Required: " + noItems + ", Available: " + allImages.length + ". Please add more images to the pictures folder.");
@@ -175,7 +171,7 @@ function start(r, l) {
             $("table").append(rowHtml);
         }
 
-        // Hiding instructions screen
+        // Hiding instructions screen / overlay
         $("#ol").fadeOut(500);
 
         // Internal flip handler
@@ -224,11 +220,19 @@ function start(r, l) {
             // Game completion check
             if (rem == 0) {
                 clearInterval(time);
-                var timeText = (min == 0) ? `${sec} seconds` : `${min} minute(s) and ${sec} second(s)`;
-                var playAgainBtns = getButtonsHtml(allImages.length);
 
                 setTimeout(function() {
-                    $("#ol").html(`<center><div id="iol"><h2>ممنون از شما موفق باشید</h2><p style="font-size:23px;padding:10px;">You completed the ${mode} mode in ${moves} moves. It took you ${timeText}.</p><p style="font-size:18px">Comment Your Score!<br/>Play Again ?</p>${playAgainBtns}</div></center>`);
+                    $("#ol").html(`
+                        <center>
+                            <div id="iol">
+                                <h2>ممنون از شما موفق باشید</h2>
+                                <div style="margin-top: 25px;">
+                                    <button onclick="start(4, 5)">بازی مجدد</button>
+                                    <button onclick="goBack()">بازگشت</button>
+                                </div>
+                            </div>
+                        </center>
+                    `);
                     $("#ol").fadeIn(750);
                 }, 1500);
             }
