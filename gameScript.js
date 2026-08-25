@@ -1,5 +1,17 @@
 // Global state for images
 var allImages = [];
+var defaultImages = [
+    "image1.jpg",
+    "image2.png",
+    "image3.webp",
+    "image4.jpeg",
+    "image5.jpg",
+    "image6.png",
+    "image7.webp",
+    "image8.jpeg",
+    "image9.jpg",
+    "image10.png"
+];
 var pre = "", pID, ppID = 0, turn = 0, t = "transform", flip = "rotateY(180deg)", flipBack = "rotateY(0deg)", time, mode;
 
 // Resizing Screen
@@ -55,17 +67,23 @@ window.onload = function() {
             return response.json();
         })
         .then(function(data) {
-            if (Array.isArray(data)) {
+            if (Array.isArray(data) && data.length >= 10) {
                 allImages = data;
             } else {
-                console.error("Invalid images.json format, expected array.");
+                console.warn("Invalid or insufficient images in images.json, using default image list fallback.");
+                allImages = defaultImages;
             }
             start(4, 5);
         })
         .catch(function(err) {
-            console.error("Error loading pictures/images.json:", err);
-            $("#ol").html(`<center><div id="inst"><h3>Error</h3><p style="font-size:18px;">Could not load pictures/images.json manifest.<br/>Please ensure pictures/images.json exists.</p></div></center>`);
-            $("#ol").show();
+            console.warn("Could not fetch pictures/images.json (e.g. file:// protocol restriction). Using default fallback images.", err);
+            if (Array.isArray(defaultImages) && defaultImages.length >= 10) {
+                allImages = defaultImages;
+                start(4, 5);
+            } else {
+                $("#ol").html(`<center><div id="inst"><h3>Error</h3><p style="font-size:18px;">Could not load card images manifest or fallback list.</p></div></center>`);
+                $("#ol").show();
+            }
         });
 };
 
