@@ -53,7 +53,6 @@ function showWelcomeOverlay() {
 // Load manifest on page load
 window.onload = function() {
     init();
-    showWelcomeOverlay();
     fetch('pictures/images.json')
         .then(function(response) {
             if (!response.ok) {
@@ -67,11 +66,12 @@ window.onload = function() {
             } else {
                 console.error("Invalid images.json format, expected array.");
             }
-            showWelcomeOverlay();
+            start(4, 5);
         })
         .catch(function(err) {
             console.error("Error loading pictures/images.json:", err);
             $("#ol").html(`<center><div id="inst"><h3>Error</h3><p style="font-size:18px;">Could not load pictures/images.json manifest.<br/>Please ensure pictures/images.json exists.</p></div></center>`);
+            $("#ol").show();
         });
 };
 
@@ -228,7 +228,7 @@ function start(r, l) {
                 var playAgainBtns = getButtonsHtml(allImages.length);
 
                 setTimeout(function() {
-                    $("#ol").html(`<center><div id="iol"><h2>Congrats!</h2><p style="font-size:23px;padding:10px;">You completed the ${mode} mode in ${moves} moves. It took you ${timeText}.</p><p style="font-size:18px">Comment Your Score!<br/>Play Again ?</p>${playAgainBtns}</div></center>`);
+                    $("#ol").html(`<center><div id="iol"><h2>ممنون از شما موفق باشید</h2><p style="font-size:23px;padding:10px;">You completed the ${mode} mode in ${moves} moves. It took you ${timeText}.</p><p style="font-size:18px">Comment Your Score!<br/>Play Again ?</p>${playAgainBtns}</div></center>`);
                     $("#ol").fadeIn(750);
                 }, 1500);
             }
