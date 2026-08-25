@@ -2,15 +2,15 @@
 var allImages = [];
 var defaultImages = [
     "image1.jpg",
-    "image2.png",
-    "image3.webp",
-    "image4.jpeg",
+    "image2.jpg",
+    "image3.jpg",
+    "image4.jpg",
     "image5.jpg",
-    "image6.png",
-    "image7.webp",
-    "image8.jpeg",
+    "image6.jpg",
+    "image7.jpg",
+    "image8.jpg",
     "image9.jpg",
-    "image10.png"
+    "image10.jpg"
 ];
 var pre = "", pID, ppID = 0, turn = 0, t = "transform", flip = "rotateY(180deg)", flipBack = "rotateY(0deg)", time, mode;
 
