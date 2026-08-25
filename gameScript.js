@@ -14,6 +14,25 @@ var defaultImages = [
 ];
 var pre = "", pID, ppID = 0, turn = 0, t = "transform", flip = "rotateY(180deg)", flipBack = "rotateY(0deg)", time, mode;
 
+var RECORDS_KEY = "raman_memory_game_top_records";
+
+// Convert numbers/digits to Persian digits
+function toPersianDigits(num) {
+    var persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+    return String(num).replace(/\d/g, function(w) {
+        return persianDigits[parseInt(w, 10)];
+    });
+}
+
+// Format seconds to mm:ss with Persian digits
+function formatTime(sec) {
+    var m = Math.floor(sec / 60);
+    var s = sec % 60;
+    var mStr = m < 10 ? "0" + m : "" + m;
+    var sStr = s < 10 ? "0" + s : "" + s;
+    return toPersianDigits(mStr + ":" + sStr);
+}
+
 // Resizing Screen
 window.onresize = init;
 function init() {
@@ -33,32 +52,79 @@ function escapeHtml(str) {
         .replace(/>/g, '&gt;');
 }
 
-// Handle "بازگشت" button click
+// Handle "بازگشت" button click using centralized CONFIG
 function goBack() {
-    fetch('back.txt')
-        .then(function(response) {
-            if (!response.ok) {
-                throw new Error("Failed to load back.txt");
-            }
-            return response.text();
-        })
-        .then(function(text) {
-            var url = text.trim();
-            if (url) {
-                window.location.href = url;
-            } else {
-                alert("لینک بازگشت در دسترس نیست.");
-            }
-        })
-        .catch(function(err) {
-            console.error("Error loading back.txt:", err);
-            alert("لینک بازگشت در دسترس نیست.");
+    var url = (typeof CONFIG !== 'undefined' && CONFIG.backUrl) ? CONFIG.backUrl : "";
+    if (url) {
+        window.location.href = url;
+    } else {
+        alert("لینک بازگشت در دسترس نیست.");
+    }
+}
+
+// Top 5 Records Management
+function getTopRecords() {
+    try {
+        var data = localStorage.getItem(RECORDS_KEY);
+        if (!data) return [];
+        var parsed = JSON.parse(data);
+        if (!Array.isArray(parsed)) return [];
+        var validRecords = parsed.filter(function(item) {
+            return typeof item === 'object' && item !== null && typeof item.time === 'number' && typeof item.moves === 'number';
         });
+        return validRecords;
+    } catch (e) {
+        console.warn("Corrupted records in localStorage, resetting.", e);
+        try {
+            localStorage.removeItem(RECORDS_KEY);
+        } catch (err) {}
+        return [];
+    }
+}
+
+function saveTopRecord(completionTime, movesCount) {
+    var records = getTopRecords();
+    records.push({ time: completionTime, moves: movesCount });
+    records.sort(function(a, b) {
+        if (a.time !== b.time) {
+            return a.time - b.time;
+        }
+        return a.moves - b.moves;
+    });
+    records = records.slice(0, 5);
+    try {
+        localStorage.setItem(RECORDS_KEY, JSON.stringify(records));
+    } catch (e) {
+        console.error("Failed to save records to localStorage", e);
+    }
+    renderTopRecords();
+}
+
+function renderTopRecords() {
+    var records = getTopRecords();
+    var $list = $("#records-list");
+    if (!$list.length) return;
+
+    if (records.length === 0) {
+        $list.html('<div class="no-records">هنوز رکوردی ثبت نشده است</div>');
+        return;
+    }
+
+    var html = "<div class='records-items'>";
+    records.forEach(function(rec, index) {
+        var rankP = toPersianDigits(index + 1);
+        var timeP = toPersianDigits(rec.time);
+        var movesP = toPersianDigits(rec.moves);
+        html += `<div class="record-row"><span class="rank" style="display:inline-block; direction:ltr;">${rankP}.</span> <span class="time-val">${timeP} ثانیه</span> — <span class="moves-val">${movesP} حرکت</span></div>`;
+    });
+    html += "</div>";
+    $list.html(html);
 }
 
 // Load manifest on page load and start 4x5 game directly
 window.onload = function() {
     init();
+    renderTopRecords();
     fetch('pictures/images.json')
         .then(function(response) {
             if (!response.ok) {
@@ -116,9 +182,12 @@ function start(r, l) {
     ppID = 0;
     pID = null;
 
-    var min = 0, sec = 0, moves = 0;
-    $("#time").html("Time: 00:00");
-    $("#moves").html("Moves: 0");
+    var maxTime = (typeof CONFIG !== 'undefined' && typeof CONFIG.gameTime === 'number' && CONFIG.gameTime > 0) ? CONFIG.gameTime : 30;
+    var remainingTime = maxTime;
+    var moves = 0;
+
+    $("#time").html("زمان: " + formatTime(remainingTime));
+    $("#moves").html("حرکت: " + toPersianDigits(moves));
 
     var rem = noItems;
     mode = r + "x" + l;
@@ -136,16 +205,32 @@ function start(r, l) {
 
     // Preload selected images before starting timer and rendering table
     preloadImages(selectedImages).then(function() {
+        // Start countdown timer
         time = setInterval(function() {
-            sec++;
-            if (sec == 60) {
-                min++;
-                sec = 0;
+            remainingTime--;
+            if (remainingTime <= 0) {
+                remainingTime = 0;
+                $("#time").html("زمان: " + formatTime(remainingTime));
+                clearInterval(time);
+                turn = 2; // Block board interactions
+
+                setTimeout(function() {
+                    $("#ol").html(`
+                        <center>
+                            <div id="iol">
+                                <h2>متاسفانه باختید. دوست دارید دوباره تلاش کنید؟</h2>
+                                <div style="margin-top: 25px;">
+                                    <button onclick="start(4, 5)">تلاش دوباره</button>
+                                    <button onclick="goBack()">بازگشت</button>
+                                </div>
+                            </div>
+                        </center>
+                    `);
+                    $("#ol").fadeIn(750);
+                }, 300);
+            } else {
+                $("#time").html("زمان: " + formatTime(remainingTime));
             }
-            if (sec < 10)
-                $("#time").html("Time: 0" + min + ":0" + sec);
-            else
-                $("#time").html("Time: 0" + min + ":" + sec);
         }, 1000);
 
         // Duplicate each image twice and shuffle
@@ -226,7 +311,7 @@ function start(r, l) {
                 setTimeout(function() {
                     turn = 0;
                     moves++;
-                    $("#moves").html("Moves: " + moves);
+                    $("#moves").html("حرکت: " + toPersianDigits(moves));
                 }, 1150);
             } else {
                 pre = cardId;
@@ -238,6 +323,8 @@ function start(r, l) {
             // Game completion check
             if (rem == 0) {
                 clearInterval(time);
+                var completionTime = maxTime - remainingTime;
+                saveTopRecord(completionTime, moves);
 
                 setTimeout(function() {
                     $("#ol").html(`

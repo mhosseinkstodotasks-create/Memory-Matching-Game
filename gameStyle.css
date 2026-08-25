@@ -246,3 +246,52 @@ button:disabled, button.disabled-btn {
 button:hover, button:active {
     outline: 0;
 }
+
+/* Top 5 Records Styles */
+#records-container {
+    width: 90vw;
+    max-width: 480px;
+    margin: 20px auto 30px auto;
+    background-color: rgba(255, 255, 255, 0.2);
+    -webkit-backdrop-filter: blur(15px);
+            backdrop-filter: blur(15px);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    padding: 15px 20px;
+    color: white;
+    direction: rtl;
+    text-align: right;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+#records-container h3 {
+    margin: 0 0 12px 0;
+    font-size: 20px;
+    font-weight: 700;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    padding-bottom: 8px;
+    color: #ffffff;
+}
+
+.no-records {
+    text-align: center;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.85);
+    padding: 10px 0;
+}
+
+.records-items {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.record-row {
+    font-size: 16px;
+    font-weight: 600;
+    background-color: rgba(0, 0, 0, 0.15);
+    padding: 8px 12px;
+    border-radius: 8px;
+    border-right: 4px solid #ffffff;
+}
