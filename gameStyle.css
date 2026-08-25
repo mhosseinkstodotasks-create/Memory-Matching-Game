@@ -1,4 +1,29 @@
-@import url('https://fonts.googleapis.com/css2?family=Biryani:wght@800&display=swap');
+@font-face {
+    font-family: 'Vazirmatn';
+    src: url('fonts/Vazirmatn-Regular.woff2') format('woff2'),
+         url('fonts/Vazirmatn-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Vazirmatn';
+    src: url('fonts/Vazirmatn-SemiBold.woff2') format('woff2'),
+         url('fonts/Vazirmatn-SemiBold.woff') format('woff');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Vazirmatn';
+    src: url('fonts/Vazirmatn-Bold.woff2') format('woff2'),
+         url('fonts/Vazirmatn-Bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
 
 :root {
     --game-rows: 4;
@@ -6,7 +31,8 @@
 }
 
 * {
-    font-family: 'Biryani', sans-serif;
+    font-family: 'Vazirmatn', 'Vazir', 'Tahoma', 'Arial', sans-serif;
+    font-weight: 400;
     box-sizing: border-box;
 }
 
@@ -72,12 +98,13 @@ button {
     margin: 8px;
     border: 1px solid #ffffff;
     border-radius: 10px;
-    font-weight: bold;
+    font-weight: 600;
     min-width: 110px;
     font-size: 18px;
     padding: 10px 16px;
     cursor: pointer;
     transition: background-color 0.2s, opacity 0.2s;
+    direction: rtl;
 }
 
 button:hover:not(:disabled) {
@@ -116,11 +143,17 @@ button:disabled, button.disabled-btn {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
+#iol {
+    direction: rtl;
+}
+
 #iol h2 {
     margin: 0;
     font-size: 26px;
+    font-weight: 700;
     color: #ffffff;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    direction: rtl;
 }
 
 #title {
@@ -152,8 +185,10 @@ button:disabled, button.disabled-btn {
 
 #logo {
     font-size: 22px;
+    font-weight: 700;
     padding-top: 10px;
     display: block;
+    direction: rtl;
 }
 
 .inner {
